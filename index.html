@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🟩 WinGo Hacker Predictor</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+    body {
+      background-color: black;
+      color: #00ff00;
+      font-family: 'Share Tech Mono', monospace;
+      text-align: center;
+      padding: 20px;
+      overflow: hidden;
+    }
+    .title {
+      font-size: 32px;
+      margin-bottom: 20px;
+      animation: flicker 1.5s infinite alternate;
+    }
+    .block {
+      background: rgba(0, 255, 0, 0.1);
+      color: #00ff00;
+      padding: 20px;
+      margin: 15px auto;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 15px #00ff00;
+    }
+    .result {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .number {
+      font-size: 32px;
+    }
+    .big {
+      color: red;
+    }
+    .small {
+      color: cyan;
+    }
+    .history {
+      text-align: left;
+      margin-top: 10px;
+      font-size: 18px;
+    }
+    .link-button {
+      margin: 10px;
+      padding: 15px 30px;
+      border: 2px solid #00ff00;
+      background: transparent;
+      color: #00ff00;
+      border-radius: 10px;
+      font-size: 18px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .link-button:hover {
+      background: #00ff00;
+      color: black;
+    }
+    @keyframes flicker {
+      0% { opacity: 1; }
+      100% { opacity: 0.7; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="title">💻 HACKING WinGo Predictor 💻</div>
+
+  <div class="block">
+    <div class="result">🔢 Prediction Number: <span class="number" id="number">-</span></div>
+    <div class="result">📊 Result: <span id="resultType">-</span></div>
+    <div>⏱ Next Prediction In: <span id="countdown">60</span>s</div>
+  </div>
+
+  <div class="block history">
+    <strong>📜 History:</strong>
+    <ul id="historyList">
+      <li>--</li>
+    </ul>
+  </div>
+
+  <a class="link-button" href="https://www.82lottery7.in/#/register?invitationCode=238352107279" target="_blank">🎯 Register</a>
+  <a class="link-button" href="https://t.me/minesprovipsingl" target="_blank">🔥 Telegram</a>
+
+  <!-- Hacking Sound -->
+  <audio id="hackSound" src="https://cdn.pixabay.com/audio/2022/08/09/audio_c88b1fef02.mp3"></audio>
+
+  <script>
+    let timer = 60;
+    let history = [];
+
+    function getPrediction() {
+      const num = Math.floor(Math.random() * 10);
+      const result = num >= 5 ? "BIG" : "SMALL";
+      playSound();
+      updatePrediction(num, result);
+    }
+
+    function updatePrediction(number, result) {
+      typeText("number", number.toString());
+      const resultElem = document.getElementById("resultType");
+      resultElem.innerText = result;
+      resultElem.className = result === "BIG" ? "big" : "small";
+
+      history.unshift(`${number} - ${result}`);
+      if (history.length > 5) history.pop();
+
+      const list = document.getElementById("historyList");
+      list.innerHTML = "";
+      history.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        list.appendChild(li);
+      });
+
+      sendToTelegram(number, result); // 🔴 Send to Telegram
+    }
+
+    function typeText(id, text) {
+      const el = document.getElementById(id);
+      el.innerText = "";
+      let i = 0;
+      const typer = setInterval(() => {
+        if (i < text.length) {
+          el.innerText += text[i];
+          i++;
+        } else {
+          clearInterval(typer);
+        }
+      }, 100);
+    }
+
+    function startCountdown() {
+      const countdown = document.getElementById('countdown');
+      function tick() {
+        countdown.innerText = timer;
+        if (timer > 0) {
+          timer--;
+          setTimeout(tick, 1000);
+        } else {
+          timer = 60;
+          getPrediction();
+          tick();
+        }
+      }
+      tick();
+    }
+
+    function playSound() {
+      const sound = document.getElementById("hackSound");
+      sound.currentTime = 0;
+      sound.play();
+    }
+
+    function sendToTelegram(number, result) {
+      const token = "8176743736:AAHBXN8v1wE09FdPb9ptQewvLWzwLR4xTa0";
+      const chatId = "@minesprovipsingl";
+      const message = `🔢 Prediction: ${number}\n📊 Result: ${result}`;
+
+      fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message
+        })
+      }).then(res => res.json())
+        .then(data => {
+          if (!data.ok) {
+            console.error("Telegram Error:", data);
+          }
+        }).catch(err => {
+          console.error("Fetch Error:", err);
+        });
+    }
+
+    // Start on page load
+    getPrediction();
+    startCountdown();
+  </script>
+
+</body>
+</html>
